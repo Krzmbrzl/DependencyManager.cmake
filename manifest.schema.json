@@ -1,0 +1,201 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/Krzmbrzl/DependencyManager.cmake/blob/main/manifest.schema.json",
+	"$defs": {
+		"id": {
+			"type": "string",
+			"minLength": 1,
+			"pattern": "^[a-zA-Z0-9_]+$"
+		},
+		"composite_id": {
+			"type": "string",
+			"minLength": 1,
+			"pattern": "^[a-zA-Z0-9_.]+$"
+		},
+		"macro_name": {
+			"type": "string",
+			"minLength": 1,
+			"pattern": "^[a-zA-Z0-9_]+$"
+		},
+		"target_name": {
+			"type": "string",
+			"minLength": 1,
+			"pattern": "^[a-zA-Z0-9_.:+-]+$"
+		},
+		"bundle": {
+			"description": "A single bundle definition",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "ID of this bundle",
+					"$ref": "#/$defs/id"
+				},
+				"min_version": {
+					"description": "The minimum version expected of this bundle",
+					"type": "string",
+					"minLength": 1
+				},
+				"requires": {
+					"description": "List of required dependencies",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/dependency"
+					}
+				},
+				"uses": {
+					"description": "List of optional dependencies",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/dependency"
+					}
+				},
+				"provides": {
+					"description": "List of components this bundle provides",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/component"
+					}
+				}
+			},
+			"required": [
+				"id"
+			]
+		},
+		"dependency": {
+			"description": "An individual dependency",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The full ID of the dependency",
+					"$ref": "#/$defs/composite_id"
+				},
+				"attaches": {
+					"description": "List of attachments that the dependency will create, if it is resolved",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/attachment"
+					}
+				}
+			},
+			"required": [
+				"id"
+			]
+		},
+		"component": {
+			"description": "An individual component",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The ID of this component",
+					"$ref": "#/$defs/id"
+				},
+				"targets": {
+					"description": "List of CMake targets that this component contains",
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/target"
+					}
+				}
+			},
+			"required": [
+				"id"
+			]
+		},
+		"attachment": {
+			"description": "An attachment that is created by a dependency being resolved",
+			"type": "object",
+			"properties": {
+				"kind": {
+					"enum": [
+						"compile_definition"
+					]
+				}
+			},
+			"required": [
+				"kind"
+			],
+			"allOf": [
+				{
+					"if": {
+						"properties": {
+							"kind": {
+								"const": "compile_definition"
+							}
+						},
+						"required": [
+							"kind"
+						]
+					},
+					"then": {
+						"properties": {
+							"name": {
+								"$ref": "#/$defs/macro_name"
+							},
+							"value": {
+								"type": [
+									"string",
+									"number"
+								]
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				}
+			]
+		},
+		"target": {
+			"description": "A single CMake target",
+			"type": "object",
+			"properties": {
+				"names": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/target_name"
+					},
+					"minItems": 1
+				},
+				"requires": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/dependency"
+					}
+				},
+				"uses": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/dependency"
+					}
+				}
+			},
+			"required": [
+				"names"
+			]
+		}
+	},
+	"title": "DependencyManager.cmake JSON Manifest",
+	"description": "Manifest file for dependency specification to be read by the DependencyManager.cmake module",
+	"type": "object",
+	"properties": {
+		"version": {
+			"description": "The version of the manifest syntax used",
+			"type": "integer",
+			"exclusiveMinimum": 0
+		},
+		"namespace": {
+			"description": "Namespace that will act as a prefix to all specified Bundle IDs",
+			"$ref": "#/$defs/id"
+		},
+		"bundles": {
+			"description": "List of defined bundles",
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/bundle"
+			}
+		}
+	},
+	"required": [
+		"version"
+	]
+}

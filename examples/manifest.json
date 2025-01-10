@@ -1,0 +1,38 @@
+{
+	"version": 1,
+	"namespace": "Something",
+	"bundles": [
+		{
+			"id": "Bundle1",
+			"min_version": "1.1",
+			"requires": [],
+			"uses": [],
+			"provides": [
+				{
+					"id": "First",
+					"targets": [
+						{
+							"names": [
+								"B1::First",
+								"B1::first"
+							],
+							"requires": [
+								{
+									"id": "Bundle1.Second",
+									"attaches": [
+										{
+											"kind": "compile_definition",
+											"name": "MY_DEF",
+											"value": 1
+										}
+									]
+								}
+							],
+							"uses": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
